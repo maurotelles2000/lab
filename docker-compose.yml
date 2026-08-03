@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres:17
+    container_name: postgres_lab
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: labdb
+    ports:
+      - "5432:5432"
+    networks:
+      - lab-network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+networks:
+  lab-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
