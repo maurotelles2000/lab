@@ -28,23 +28,13 @@
 		<url />
 	</scm>
 	<properties>
+		<start-class>com.lab.LabApplication</start-class>
 		<java.version>21</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
-			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
@@ -55,11 +45,6 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa-test</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -103,6 +88,12 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.graalvm.buildtools</groupId>
+				<artifactId>native-maven-plugin</artifactId>
+				<version>0.10.3</version>
+			</plugin>
+
+			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
@@ -114,6 +105,7 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -152,5 +144,33 @@
 			</plugin>
 		</plugins>
 	</build>
-
+	
+	<profiles>
+	    <profile>
+	        <id>dev</id>
+	        <activation>
+	            <activeByDefault>true</activeByDefault>
+	        </activation>
+	        <dependencies>
+	            <dependency>
+	                <groupId>org.springframework.boot</groupId>
+	                <artifactId>spring-boot-devtools</artifactId>
+	                <scope>runtime</scope>
+	                <optional>true</optional>
+	            </dependency>
+	        </dependencies>
+	    </profile>
+	
+	    <profile>
+	        <id>native</id>
+	        <build>
+	            <plugins>
+	                <plugin>
+	                    <groupId>org.graalvm.buildtools</groupId>
+	                    <artifactId>native-maven-plugin</artifactId>
+	                </plugin>
+	            </plugins>
+	        </build>
+	    </profile>
+	</profiles>	
 </project>
