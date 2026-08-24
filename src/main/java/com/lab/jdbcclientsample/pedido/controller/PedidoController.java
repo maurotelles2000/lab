@@ -1,8 +1,5 @@
 package com.lab.jdbcclientsample.pedido.controller;
 
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,13 +7,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.ContentCachingRequestWrapper;
 
-import com.lab.jdbcclientsample.pedido.dto.PedidoDto;
+import com.lab.jdbcclientsample.pedido.dto.PedidoPaginadoResponseDto;
 import com.lab.jdbcclientsample.pedido.dto.PedidoRequest;
 import com.lab.jdbcclientsample.pedido.service.PedidoService;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/pedidos")
@@ -36,11 +30,12 @@ public class PedidoController {
 	}
 
 	@GetMapping("/pesquisa")
-	public List<PedidoDto> pesquisar(@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "10") int size) {
-		return pedidoService.pesquisar(page, size);
+	public ResponseEntity<PedidoPaginadoResponseDto> pesquisar(
+	        @RequestParam(defaultValue = "0") int page,
+	        @RequestParam(defaultValue = "10") int size) {
+	    PedidoPaginadoResponseDto resultado = pedidoService.pesquisar(page, size);
+	    return ResponseEntity.ok(resultado);
 	}
-
 	@GetMapping("/memoria")
 	public String verificarMemoria() {
 		Runtime runtime = Runtime.getRuntime();

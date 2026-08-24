@@ -12,3 +12,13 @@ BEGIN
     LIMIT p_limit OFFSET p_offset;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION fn_contar_pedidos()
+RETURNS BIGINT AS $$
+DECLARE
+    v_total BIGINT;
+BEGIN
+    SELECT COUNT(*) INTO v_total FROM pedidos;
+    RETURN v_total;
+END;
+$$ LANGUAGE plpgsql;
