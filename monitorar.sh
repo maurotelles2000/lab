@@ -1,40 +1,28 @@
 #!/bin/bash
 
-# Nome do arquivo de log onde a evolução será salva
-LOG_FILE="evolucao_memoria.txt"
+LOG="consumo_carga.log"
+> "$LOG" # Limpa o log anterior
 
-echo "Data/Hora | Memória Usada (MB)" > "$LOG_FILE"
-echo "Iniciando monitoramento de memória. Pressione CTRL+C para parar."
+echo "=== INÍCIO DO TESTE DE CARGA ===" | tee -a "$LOG"
 
-# Descobre o PID do processo Java/Spring Boot automaticamente
-PID=$(pgrep -f "java" | head -n 1)
+# 1. Inicia o monitoramento em segundo plano e guarda o PID dele
+while true; do
+    echo "=== $(date) ===" >> "$LOG"
+    ps -eo %cpu,%mem,comm | grep "postgres" | awk '{cpu+=$1; mem+=$2} END {printf "Postgres Total -> CPU: %.1f%% | MEM: %.1f%%\n", cpu, mem}' >> "$LOG"
+    ps -eo %cpu,%mem,comm | grep "lab" | awk '{cpu+=$1; mem+=$2} END {printf "Lab Total      -> CPU: %.1f%% | MEM: %.1f%%\n", cpu, mem}' >> "$LOG"
+    echo "" >> "$LOG"
+    sleep 1
+done &
+MONITOR_PID=$!
 
-if [ -z "$PID" ]; then
-    # Tenta procurar caso seja um binário nativo do GraalVM (substitua 'seu-app' pelo nome do binário se necessário)
-    PID=$(pgrep -f "target/" | head -n 1)
-fi
+# 2. Roda o hey (substitua pelos seus parâmetros de URL, requisições e concorrência)
+# Exemplo: 1000 requisições total, 50 concorrentes
+echo "Executando o hey..."
+hey -n 10000 -c 100 -m POST -D pedido.json -H "Content-Type: application/json" http://localhost:8080/pedidos
+hey -n 10000 -c 100 "http://localhost:8080/pedidos/pesquisa?page=0&size=10"
 
-if [ -z "$PID" ]; then
-    echo "Erro: Não foi possível encontrar o processo da aplicação."
-    exit 1
-fi
 
-echo "Monitorando o PID: $PID. Gravando em $LOG_FILE..."
+# 3. Para o monitoramento assim que o hey terminar
+kill $MONITOR_PID 2>/dev/null
 
-# Loop infinito gravando enquanto o processo estiver rodando
-while kill -0 "$PID" 2>/dev/null; do
-    # Pega a memória RSS em Kilobytes e converte para Megabytes
-    MEM_KB=$(ps -o rss= -p "$PID" | tr -d ' ')
-
-    if [ -n "$MEM_KB" ]; then
-        MEM_MB=$(echo "scale=2; $MEM_KB / 1024" | bc)
-        TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
-
-        # Escreve no terminal e no arquivo ao mesmo tempo
-        echo "$TIMESTAMP | $MEM_MB MB" | tee -a "$LOG_FILE"
-    fi
-
-    sleep 2
-done
-
-echo "A aplicação foi encerrada. Log salvo em $LOG_FILE."
+echo "=== FIM DO TESTE DE CARGA ===" | tee -a "$LOG"
