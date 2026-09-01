@@ -37,3 +37,8 @@ $$;
 
 CREATE INDEX IF NOT EXISTS idx_pedidos_cliente_id_id_desc 
 ON pedidos (cliente_id, id DESC);
+
+
+
+CREATE INDEX IF NOT EXISTS idx_pedidos_id_desc ON pedidos (id DESC);
+
