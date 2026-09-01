@@ -3,7 +3,6 @@ package com.lab.jdbcclientsample.pedido.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.lab.jdbcclientsample.pedido.dto.PedidoPaginadoResponseDto;
 import com.lab.jdbcclientsample.pedido.dto.PedidoRequest;
 import com.lab.jdbcclientsample.pedido.repository.PedidoRepository;
 
@@ -26,7 +25,8 @@ public class PedidoService {
 		pedidoRepository.salvarPedido(request);
 	}
 
-	public PedidoPaginadoResponseDto pesquisar(int page, int size) {
-		return pedidoRepository.listarPaginado(page, size);
+	public String pesquisar(Long ultimoId, int limit) {
+		String jsonPaginado = pedidoRepository.listarPaginadoJson(ultimoId, limit);
+		return jsonPaginado;
 	}
 }

@@ -32,9 +32,11 @@ services:
         - DB_NAME=labdb
         - POOL_MODE=transaction
         - MAX_CLIENT_CONN=1000
-        - DEFAULT_POOL_SIZE=20
+        - DEFAULT_POOL_SIZE=25
+        - RESERVE_POOL_SIZE=10
         - ADMIN_USERS=user
         - LISTEN_PORT=6432		
+        - IGNORE_STARTUP_PARAMETERS=extra_float_digits
       ports:
         - "6432:6432"
       networks:

@@ -45,28 +45,15 @@ public class PedidoRepository {
 		}
 	}
 
-	public PedidoPaginadoResponseDto listarPaginado(int page, int size) {
-		int offset = page * size;
-
-		// 1. Busca o total de registros usando a função de contagem
-		String sqlCount = "SELECT fn_contar_pedidos()";
-		Long totalRegistros = jdbcClient.sql(sqlCount)
-				.query(Long.class)
-				.single();
-
-		// 2. Busca os dados paginados utilizando o mapeamento automático do JdbcClient
-		String sqlList = "SELECT * FROM fn_listar_pedidos(:limit, :offset)";
-		List<PedidoDto> itens = jdbcClient.sql(sqlList)
-				.param("limit", size)
-				.param("offset", offset)
-				.query(PedidoDto.class)
-				.list();
-
-		// 3. Retorna o DTO estruturado com a paginação completa
-		return new PedidoPaginadoResponseDto(itens, totalRegistros != null ? totalRegistros : 0L, page, size);
-	}
-
-	
-	
+	public String listarPaginadoJson(Long ultimoId, int limit) {
+	    int safeLimit = Math.clamp(limit, 1, 100);
+	    String sql = "SELECT fn_listar_pedidos_keyset(:ultimoId, :limit)::text";
+	    return jdbcClient.sql(sql)
+	            .param("ultimoId", ultimoId)
+	            .param("limit", safeLimit)
+	            .query(String.class)
+	            .optional()
+	            .orElse("{\"content\":[],\"nextCursor\":null,\"hasNext\":false,\"limit\":"+safeLimit+"}");
+	}	
 	
 }
