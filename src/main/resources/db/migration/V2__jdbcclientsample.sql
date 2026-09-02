@@ -14,31 +14,14 @@ CREATE TABLE IF NOT EXISTS itens_pedido (
 
 
 CREATE OR REPLACE PROCEDURE sp_inserir_pedido(p_payload JSONB)
-LANGUAGE plpgsql AS $$
-DECLARE
-    v_cliente_id BIGINT;
-    v_pedido_id BIGINT;
-BEGIN
-    v_cliente_id := (p_payload->>'clienteId')::BIGINT;
-    
-    INSERT INTO pedidos (cliente_id) VALUES (v_cliente_id)
-    RETURNING id INTO v_pedido_id;
-
-    INSERT INTO itens_pedido (pedido_id, produto_id, quantidade, preco_unitario)
-    SELECT 
-        v_pedido_id,
-        (item->>'produtoId')::BIGINT,
-        (item->>'quantidade')::INTEGER,
-        (item->>'precoUnitario')::NUMERIC
-    FROM jsonb_array_elements(p_payload->'itens') AS item;
-END;
+LANGUAGE sql AS $$
+  WITH novo_pedido AS (
+    INSERT INTO pedidos (cliente_id) 
+    VALUES ((p_payload->>'clienteId')::BIGINT)
+    RETURNING id
+  )
+  INSERT INTO itens_pedido (pedido_id, produto_id, quantidade, preco_unitario)
+  SELECT (SELECT id FROM novo_pedido), "produtoId", quantidade, "precoUnitario"
+  FROM jsonb_to_recordset(p_payload->'itens') 
+  AS x("produtoId" BIGINT, quantidade INT, "precoUnitario" NUMERIC);
 $$;
-
-
-CREATE INDEX IF NOT EXISTS idx_pedidos_cliente_id_id_desc 
-ON pedidos (cliente_id, id DESC);
-
-
-
-CREATE INDEX IF NOT EXISTS idx_pedidos_id_desc ON pedidos (id DESC);
-
