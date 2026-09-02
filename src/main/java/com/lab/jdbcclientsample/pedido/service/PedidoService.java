@@ -3,7 +3,6 @@ package com.lab.jdbcclientsample.pedido.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.lab.jdbcclientsample.pedido.dto.PedidoRequest;
 import com.lab.jdbcclientsample.pedido.repository.PedidoRepository;
 
 @Service
@@ -16,13 +15,8 @@ public class PedidoService {
 	}
 
 	@Transactional
-	public void cadastrar(PedidoRequest request) {
-		pedidoRepository.salvarPedido(request);
-	}
-
-	@Transactional
-	public void cadastrar(String request) {
-		pedidoRepository.salvarPedido(request);
+	public Long salvar(String pedido) {
+		return pedidoRepository.salvar(pedido);
 	}
 
 	public String pesquisar(Long ultimoId, int limit) {
