@@ -1,6 +1,5 @@
 package com.lab.jdbcclientsample.pedido.controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +26,7 @@ public class PedidoController {
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Long> criar(@RequestBody JsonNode pedido) {
 		PedidoValidator.validar(pedido);
-		Long id = pedidoService.salvar(pedido.toString());
+//		Long id = pedidoService.salvar(pedido.toString());
 		//return ResponseEntity.status(HttpStatus.CREATED).body(id);
 		return ResponseEntity.ok().build();
 		
